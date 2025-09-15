@@ -82,13 +82,42 @@ socket.on("receive_message", data => {
 });
 
 // Append message to chat
-function appendMessage(type, sender, message) {
+function appendMessage(type, sender, message, messageId = null) {
   const div = document.createElement("div");
   div.className = `chat-bubble ${type}`;
-  div.innerHTML = `<div class="sender-name">${sender}</div>${message}`;
+
+  if(type === "sent") {
+    div.innerHTML = `<div class="sender-name">${sender}</div>
+                     <span class="message-text">${message}</span>
+                     <span class="edit-btn">Edit</span>`;
+    
+    const editBtn = div.querySelector(".edit-btn");
+    const messageText = div.querySelector(".message-text");
+
+    editBtn.onclick = () => {
+      const newMessage = prompt("Edit your message:", messageText.textContent);
+      if(newMessage !== null && newMessage.trim() !== "") {
+        messageText.textContent = newMessage;
+        
+        // Update the server if needed
+        const data = {
+          room: selectedUser.id,
+          sender: currentUser.name,
+          message: newMessage,
+          edited: true
+        };
+        socket.emit("send_message", data);
+      }
+    };
+  } else {
+    div.innerHTML = `<div class="sender-name">${sender}</div>
+                     <span class="message-text">${message}</span>`;
+  }
+
   chatBody.appendChild(div);
   chatBody.scrollTop = chatBody.scrollHeight;
 }
+
 
 // Theme toggle
 themeToggle.onclick = () => {
