@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WhatsApp-Style Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light-theme">
+  <div class="app-container">
+    <!-- Sidebar -->
+    <div class="sidebar-wrapper">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">eTalks</h2>
+          <button class="theme-icon-btn" id="theme-toggle"><i class="fa fa-moon"></i></button>
+        </div>
+        <input type="text" id="search-input" placeholder="Search users..." style="padding:8px 12px; border-radius:8px; margin-left: -10px; border:1px solid #ccc; width:100%; margin-bottom:10px;">
+        <div class="sidebar-users" id="users-list"></div>
+      </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-wrapper">
+      <div class="chat-window-container">
+        <div class="chat-header">
+          <div class="header-left">
+            <div class="chat-avatar" id="chat-username-avatar">M</div>
+            <span class="chat-name" id="chat-username">Select User</span>
+          </div>
+          <div class="header-right">
+            <span class="call-icon"><i class="fa fa-phone"></i></span>
+            <span class="video-icon"><i class="fa fa-video"></i></span>
+            <div class="msg-menu" id="menu-toggle">⋮
+              <div id="dropdown" class="dropdown-options" style="display:none;">
+                <div id="clear-chat">Clear Chat</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-body" id="chat-body"></div>
+
+        <div class="chat-input-box">
+          <input type="text" id="chat-input" placeholder="Type a message..." style="margin-left: -10px;">
+          <button id="send-btn" style="margin-left: -1px; size: 10px;"><i class="fa fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
