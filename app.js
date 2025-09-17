@@ -1,4 +1,7 @@
-const socket = io("http://localhost:3001");
+const socket = new WebSocket(
+    "ws://" + window.location.host + "/ws/chat/"
+);
+
 
 const usersList = document.getElementById("users-list");
 const chatBody = document.getElementById("chat-body");
