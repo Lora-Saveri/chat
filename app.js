@@ -18,10 +18,54 @@ const searchInput = document.getElementById("search-input");
 let selectedUser = null;
 let currentUser = { id: "me", name: "Me" };
 
-// Load users from backend API
+// WebSocket connection (global)
+let socket = null;
+
+// Connect to a user (room)
+function connectToRoom(user) {
+  if (socket) socket.close();
+
+  socket = new WebSocket(
+    "ws://" + window.location.host + "/ws/chat/" + user.id + "/"
+  );
+
+  socket.onopen = () => {
+    console.log("Connected to room:", user.name);
+  };
+
+  socket.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (selectedUser && data.sender !== currentUser.name) {
+      appendMessage("received", data.sender, data.message);
+    }
+  };
+
+  socket.onclose = () => {
+    console.log("Disconnected from room");
+  };
+}
+
+// Send message
+function sendMessage() {
+  const message = chatInput.value.trim();
+  if (!message || !selectedUser) return;
+
+  const data = {
+    message,
+    sender: currentUser.name,
+  };
+
+  socket.send(JSON.stringify(data));
+  appendMessage("sent", currentUser.name, message);
+  chatInput.value = "";
+}
+
+// UI Hooks (your existing code with slight edits)
+
+// Load users (from Django DB → rendered in template or via Channels, not fetch)
 async function loadUsers() {
-  const res = await fetch("http://localhost:3001/api/users");
-  const users = await res.json();
+  // Example: preload users via Django template context instead of API
+  const users = window.chatUsers || []; 
   renderUsers(users);
 }
 loadUsers();
@@ -42,25 +86,36 @@ function renderUsers(users) {
   });
 }
 
-// Select user and join room
+// Select user and join their room
 function selectUser(user, div) {
   selectedUser = user;
   chatUsername.textContent = user.name;
   chatAvatar.textContent = user.name.charAt(0).toUpperCase();
   chatBody.innerHTML = "";
-  
-  // Highlight selected user
+
   document.querySelectorAll('.sidebar-user').forEach(el => el.classList.remove('selected'));
   div.classList.add('selected');
 
-  socket.emit("join_room", user.id);
+  connectToRoom(user);
 }
 
-// Send message
+// Append message to chat
+function appendMessage(type, sender, message) {
+  const div = document.createElement("div");
+  div.className = `chat-bubble ${type}`;
+  div.innerHTML = `<div class="sender-name">${sender}</div>${message}`;
+  chatBody.appendChild(div);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Keypress + Button
 sendBtn.onclick = sendMessage;
 chatInput.addEventListener("keypress", e => {
   if (e.key === "Enter") sendMessage();
 });
+
+// Rest of your theme toggle, dropdown, clear chat, search logic stays SAME
+
 
 function sendMessage() {
   const message = chatInput.value.trim();
