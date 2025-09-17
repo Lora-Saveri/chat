@@ -48,7 +48,27 @@
       </div>
     </div>
   </div>
+  
+  <script>
+  // Provide chatUsers and currentUser to the frontend.
+  // Example: chatUsers is a list of conversations user participates in with fields {id, name, unread_count, last_message_text}
+  window.currentUser = {
+    id: "{{ request.user.id }}",
+    name: "{{ request.user.get_full_name|default:request.user.email }}",
+  };
 
+  window.chatUsers = [
+    {% for participant in request.user.chat_participations.all %}
+      {
+        id: "{{ participant.conversation.id }}",
+        name: "{% if participant.conversation.is_group %}{{ participant.conversation.name }}{% else %}{% with other=participant.conversation.participants.exclude(id=request.user.id).first %}{{ other.user.first_name|default:other.user.email }}{% endwith %}{% endif %}",
+        unread_count: {{ participant.unread_count|default:0 }},
+        last_message_text: "{{ participant.conversation.messages.first.text|default:''|escapejs }}",
+        last_message_at: "{{ participant.conversation.last_message_at|default:'' }}"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+</script>
   <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
   <script src="{% static 'etalks.js' %}"></script>
 </body>
