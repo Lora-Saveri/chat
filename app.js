@@ -1,5 +1,5 @@
 const socket = new WebSocket(
-    "ws://" + window.location.host + "/ws/chat/"
+    "ws://" + window.location.host + "/ws/app/"
 );
 
 
